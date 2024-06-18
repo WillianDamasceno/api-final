@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Task;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
@@ -113,5 +114,85 @@ Route::group(['prefix' => 'auth'], function () {
   Route::get('/delete', function () {
     User::where('id', (int) request('id'))->delete();
     return response()->json(['data' => true]);
+  });
+});
+
+Route::group(['prefix' => 'task'], function () {
+  Route::get('get-all', function () {
+    return response()->json(
+      User::find((int) request('id'))
+        ->tasks()
+        ->orderBy('id', 'desc')
+        ->get()
+    );
+  });
+
+  Route::get('get', function () {
+    $task = Task::find((int) request('id'));
+
+    return response()->json([
+      'name' => $task->name,
+      'completed' => $task->completed,
+      'user_id' => $task->user_id,
+    ]);
+  });
+
+  Route::get('create', function () {
+    $validator = Validator::make(request()->all(), [
+      'name' => 'required|string|max:255',
+      'user_id' => 'required|integer',
+    ]);
+
+    if ($validator->fails()) {
+      return response()->json(['error' => true], 422);
+    }
+
+    $task = Task::create([
+      'name' => request('name'),
+      'user_id' => request('user_id'),
+    ]);
+
+    return response()->json(['data' => "$task->id"]);
+  });
+
+  Route::get('update', function () {
+    $task = Task::find((int) request('id'));
+
+    if (!$task) {
+      return response()->json(['error' => 'not found'], 404);
+    }
+
+    $validator = Validator::make(request()->all(), [
+      'name' => 'nullable|string|max:255',
+      'completed' => 'nullable|boolean',
+    ]);
+
+    if ($validator->fails()) {
+      return response()->json(['error' => true], 422);
+    }
+
+    if (request('name')) {
+      $task->name = request('name');
+    }
+
+    if (request('completed')) {
+      $task->completed = request('completed');
+    }
+
+    $task->save();
+
+    return response()->json(['data' => "$task->id"]);
+  });
+
+  Route::get('delete', function () {
+    $task = Task::find((int) request('id'));
+
+    if (!$task) {
+      return response()->json(['error' => 'not found'], 404);
+    }
+
+    $task->delete();
+
+    return response()->json(['data' => "$task->id"]);
   });
 });

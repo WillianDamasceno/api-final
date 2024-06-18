@@ -12,8 +12,16 @@ class Task extends Model
 
   protected $fillable = [
     'name',
-    'completed',
+    'status',
   ];
+
+  const STATUS_PENDING = 'pending';
+  const STATUS_DONE = 'done';
+
+  protected static function booted(): void
+  {
+    static::creating(fn (Task $task) => $task->status = self::STATUS_PENDING);
+  }
 
   public function user(): BelongsTo
   {
