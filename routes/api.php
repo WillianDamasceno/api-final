@@ -108,6 +108,8 @@ Route::group(['prefix' => 'auth'], function () {
     return response()->json([
       'name' => $user->name,
       'email' => $user->email,
+      'pair-id' => $user->partner_id,
+      'code' => $user->code,
     ]);
   });
 
@@ -195,4 +197,21 @@ Route::group(['prefix' => 'task'], function () {
 
     return response()->json(['data' => "$task->id"]);
   });
+});
+
+Route::get('pair', function () {
+  $user = User::find((int) request('user_id'));
+  $pairUser = User::where('code', request('pair_code'));
+
+  if (!$pairUser) {
+    return response()->json(['error' => 'not found'], 200);
+  }
+
+  if ($user->id === $pairUser->id) {
+    return response()->json(['error' => 'self pair'], 200);
+  }
+
+  $user->setPartner($pairUser);
+
+  return response()->json(['data' => "worked"]);
 });
