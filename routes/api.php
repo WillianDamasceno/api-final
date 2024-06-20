@@ -31,7 +31,7 @@ Route::group(['prefix' => 'auth'], function () {
     ]);
 
     if ($validator->fails()) {
-      return response()->json(['error' => true], 422);
+      return response()->json(['error' => true], 200);
     }
 
     $user = User::create([
@@ -50,7 +50,7 @@ Route::group(['prefix' => 'auth'], function () {
     ]);
 
     if ($validator->fails()) {
-      return response()->json(['error' => true], 422);
+      return response()->json(['error' => true], 200);
     }
 
     $user = User::where('email', request('email'))
@@ -58,11 +58,11 @@ Route::group(['prefix' => 'auth'], function () {
       ->first();
 
     if (!$user) {
-      return response()->json(['data' => 'not found'], 404);
+      return response()->json(['data' => 'not found'], 200);
     }
 
     if (!request('password') === $user->pass) {
-      return response()->json(['error' => true], 401);
+      return response()->json(['error' => true], 200);
     }
 
     return response()->json(['data' => "$user->id"]);
@@ -72,7 +72,7 @@ Route::group(['prefix' => 'auth'], function () {
     $user = User::find((int) request('id'));
 
     if (!$user) {
-      return response()->json(['error' => true], 404);
+      return response()->json(['error' => true], 200);
     }
 
     $validator = Validator::make(request()->all(), [
@@ -82,7 +82,7 @@ Route::group(['prefix' => 'auth'], function () {
     ]);
 
     if ($validator->fails()) {
-      return response()->json(['error' => true], 422);
+      return response()->json(['error' => true], 200);
     }
 
     if (request('name')) {
@@ -144,7 +144,7 @@ Route::group(['prefix' => 'task'], function () {
     ]);
 
     if ($validator->fails()) {
-      return response()->json(['error' => true], 422);
+      return response()->json(['error' => true], 200);
     }
 
     $task = Task::create([
@@ -159,7 +159,7 @@ Route::group(['prefix' => 'task'], function () {
     $task = Task::find((int) request('id'));
 
     if (!$task) {
-      return response()->json(['error' => 'not found'], 404);
+      return response()->json(['error' => 'not found'], 200);
     }
 
     $validator = Validator::make(request()->all(), [
@@ -168,7 +168,7 @@ Route::group(['prefix' => 'task'], function () {
     ]);
 
     if ($validator->fails()) {
-      return response()->json(['error' => true], 422);
+      return response()->json(['error' => true], 200);
     }
 
     if (request('name')) {
@@ -188,7 +188,7 @@ Route::group(['prefix' => 'task'], function () {
     $task = Task::find((int) request('id'));
 
     if (!$task) {
-      return response()->json(['error' => 'not found'], 404);
+      return response()->json(['error' => 'not found'], 200);
     }
 
     $task->delete();
