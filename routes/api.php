@@ -108,7 +108,7 @@ Route::group(['prefix' => 'auth'], function () {
     return response()->json([
       'name' => $user->name,
       'email' => $user->email,
-      'pair-id' => $user->partner_id,
+      'pair-id' => $user->partner_id ?? "",
       'code' => $user->code,
     ]);
   });
