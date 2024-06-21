@@ -27,17 +27,17 @@ Route::group(['prefix' => 'auth'], function () {
 
     $validator = Validator::make(request()->all(), [
       'name' => 'required|string|max:255',
-      'password' => 'required|string',
+      'pass' => 'required|string',
     ]);
 
     if ($validator->fails()) {
-      return response()->json(['error' => true], 200);
+      return response()->json(['error' => 'invalid data'], 200);
     }
 
     $user = User::create([
       'name' => request('name'),
       'email' => request('email'),
-      'pass' => request('password'),
+      'pass' => request('pass'),
     ]);
 
     return response()->json(['data' => "$user->id"]);
@@ -46,23 +46,23 @@ Route::group(['prefix' => 'auth'], function () {
   Route::get('/login', function () {
     $validator = Validator::make(request()->all(), [
       'email' => 'required|string|max:255',
-      'password' => 'required|string',
+      'pass' => 'required|string',
     ]);
 
     if ($validator->fails()) {
-      return response()->json(['error' => true], 200);
+      return response()->json(['error' => 'invalid email or password'], 200);
     }
 
     $user = User::where('email', request('email'))
-      ->where('pass', request('password'))
+      ->where('pass', request('pass'))
       ->first();
 
     if (!$user) {
       return response()->json(['data' => 'not found'], 200);
     }
 
-    if (!request('password') === $user->pass) {
-      return response()->json(['error' => true], 200);
+    if (!request('pass') === $user->pass) {
+      return response()->json(['error' => 'not found'], 200);
     }
 
     return response()->json(['data' => "$user->id"]);
@@ -78,7 +78,7 @@ Route::group(['prefix' => 'auth'], function () {
     $validator = Validator::make(request()->all(), [
       'name' => 'nullable|string|max:255',
       'email' => 'nullable|string|email|max:255',
-      'password' => 'nullable|string',
+      'pass' => 'nullable|string',
     ]);
 
     if ($validator->fails()) {
@@ -93,13 +93,18 @@ Route::group(['prefix' => 'auth'], function () {
       $user->email = request('email');
     }
 
-    if (request('password')) {
-      $user->pass = request('password');
+    if (request('pass')) {
+      $user->pass = request('pass');
     }
 
     $user->save();
 
-    return response()->json(['data' => $user->id]);
+    return response()->json(['data' => [
+      'name' => $user->name,
+      'email' => $user->email,
+      'pair-id' => $user->partner_id ?? "",
+      'code' => $user->code,
+    ]]);
   });
 
   Route::get('/get', function () {
@@ -115,7 +120,7 @@ Route::group(['prefix' => 'auth'], function () {
 
   Route::get('/delete', function () {
     User::where('id', (int) request('id'))->delete();
-    return response()->json(['data' => true]);
+    return response()->json(['data' => 'deleted']);
   });
 });
 
