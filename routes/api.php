@@ -201,7 +201,7 @@ Route::group(['prefix' => 'task'], function () {
 
 Route::get('pair', function () {
   $user = User::find((int) request('user_id'));
-  $pairUser = User::where('code', request('pair_code'))->get();
+  $pairUser = User::where('code', request('pair_code'))->first();
 
   if (!$pairUser) {
     return response()->json(['error' => 'not found'], 200);
