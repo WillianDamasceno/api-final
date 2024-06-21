@@ -121,12 +121,8 @@ Route::group(['prefix' => 'auth'], function () {
 
 Route::group(['prefix' => 'task'], function () {
   Route::get('get-all', function () {
-    return response()->json(
-      User::find((int) request('id'))
-        ->tasks()
-        ->orderBy('id', 'desc')
-        ->get()
-    );
+    $user = User::find((int) request('id'));
+    return response()->json($user->getTasks());
   });
 
   Route::get('get', function () {
@@ -134,8 +130,9 @@ Route::group(['prefix' => 'task'], function () {
 
     return response()->json([
       'name' => $task->name,
-      'completed' => $task->completed,
+      'status' => $task->status,
       'user_id' => $task->user_id,
+      'partner_id' => $task->partner_id,
     ]);
   });
 
@@ -146,13 +143,11 @@ Route::group(['prefix' => 'task'], function () {
     ]);
 
     if ($validator->fails()) {
-      return response()->json(['error' => true], 200);
+      return response()->json(['error' => 'invalid data'], 200);
     }
 
-    $task = Task::create([
-      'name' => request('name'),
-      'user_id' => request('user_id'),
-    ]);
+    $user = User::find((int) request('user_id'));
+    $task = $user->createTask(request('name'));
 
     return response()->json(['data' => "$task->id"]);
   });
@@ -166,19 +161,19 @@ Route::group(['prefix' => 'task'], function () {
 
     $validator = Validator::make(request()->all(), [
       'name' => 'nullable|string|max:255',
-      'completed' => 'nullable|boolean',
+      'status' => 'nullable|boolean',
     ]);
 
     if ($validator->fails()) {
-      return response()->json(['error' => true], 200);
+      return response()->json(['error' => 'invalid data'], 200);
     }
 
     if (request('name')) {
       $task->name = request('name');
     }
 
-    if (request('completed')) {
-      $task->completed = request('completed');
+    if (request('status')) {
+      $task->status = request('status');
     }
 
     $task->save();
@@ -195,7 +190,7 @@ Route::group(['prefix' => 'task'], function () {
 
     $task->delete();
 
-    return response()->json(['data' => "$task->id"]);
+    return response()->json(['data' => "deleted"]);
   });
 });
 

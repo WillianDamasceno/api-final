@@ -48,7 +48,10 @@ class User extends Authenticatable
 
   public function tasks(): HasMany
   {
-    return $this->hasMany(Task::class);
+    return $this->hasMany(Task::class)->where(function ($query) {
+      $query->where('user_id', $this->id)
+        ->orWhere('user_id', $this->partner_id);
+    });
   }
 
   public function setPartner(User $partner): void
@@ -58,5 +61,24 @@ class User extends Authenticatable
 
     $this->save();
     $partner->save();
+  }
+
+  public function getTasks()
+  {
+    $userTasks = $this->tasks()->orderByDesc('created_at')->get();
+    $partnerTasks = $this->partner->tasks()->orderByDesc('created_at')->get();
+
+    return $userTasks->merge($partnerTasks)->sortByDesc('created_at');
+  }
+
+  public function createTask(string $name): Task
+  {
+    $task = Task::create([
+      'name' => $name,
+      'user_id' => $this->id,
+      'partner_id' => $this->partner_id,
+    ]);
+
+    return $task;
   }
 }
