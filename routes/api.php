@@ -59,7 +59,7 @@ Route::group(['prefix' => 'auth'], function () {
 
     if (!$user) {
       return response()->json(['data' => 'not found'], 200);
-    }
+    } 
 
     if (!request('pass') === $user->pass) {
       return response()->json(['error' => 'not found'], 200);
@@ -102,7 +102,7 @@ Route::group(['prefix' => 'auth'], function () {
     return response()->json(['data' => [
       'name' => $user->name,
       'email' => $user->email,
-      'pair-id' => $user->partner_id ?? "",
+      'pair-id' => "$user->partner_id" ?? "",
       'code' => $user->code,
     ]]);
   });
@@ -113,7 +113,7 @@ Route::group(['prefix' => 'auth'], function () {
     return response()->json([
       'name' => $user->name,
       'email' => $user->email,
-      'pair-id' => $user->partner_id ?? "",
+      'pair-id' => "$user->partner_id" ?? "",
       'code' => $user->code,
     ]);
   });
@@ -136,8 +136,8 @@ Route::group(['prefix' => 'task'], function () {
     return response()->json([
       'name' => $task->name,
       'status' => $task->status,
-      'user_id' => $task->user_id,
-      'partner_id' => $task->partner_id,
+      'user_id' => "{$task->user_id}",
+      'partner_id' => "{$task->partner_id}",
     ]);
   });
 

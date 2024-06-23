@@ -13,6 +13,8 @@ class Task extends Model
   protected $fillable = [
     'name',
     'status',
+    'user_id',
+    'partner_id',
   ];
 
   const STATUS_PENDING = 'pending';
