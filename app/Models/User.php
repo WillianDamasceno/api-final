@@ -68,7 +68,7 @@ class User extends Authenticatable
     $userTasks = $this->tasks()->orderByDesc('created_at')->get();
     $partnerTasks = $this->partner->tasks()->orderByDesc('created_at')->get();
 
-    return $userTasks->merge($partnerTasks)->sortByDesc('created_at');
+    return array_values($userTasks->merge($partnerTasks)->sortByDesc('created_at')->toArray());
   }
 
   public function createTask(string $name): Task
