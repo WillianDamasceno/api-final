@@ -183,7 +183,7 @@ Route::group(['prefix' => 'task'], function () {
 
     $task->save();
 
-    return response()->json(['data' => "$task->id"]);
+    return response()->json($task);
   });
 
   Route::get('delete', function () {
