@@ -166,7 +166,7 @@ Route::group(['prefix' => 'task'], function () {
 
     $validator = Validator::make(request()->all(), [
       'name' => 'nullable|string|max:255',
-      'status' => 'nullable|boolean',
+      'status' => 'nullable|string',
     ]);
 
     if ($validator->fails()) {
