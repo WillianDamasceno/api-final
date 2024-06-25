@@ -59,7 +59,7 @@ Route::group(['prefix' => 'auth'], function () {
 
     if (!$user) {
       return response()->json(['data' => 'not found'], 200);
-    } 
+    }
 
     if (!request('pass') === $user->pass) {
       return response()->json(['error' => 'not found'], 200);
@@ -119,7 +119,14 @@ Route::group(['prefix' => 'auth'], function () {
   });
 
   Route::get('/delete', function () {
-    User::where('id', (int) request('id'))->delete();
+    $user = User::find((int) request('id'));
+    $pairUser = $user->partner;
+
+    $pairUser->partner_id = null;
+    $pairUser->save();
+
+    $user->delete();
+
     return response()->json(['data' => 'deleted']);
   });
 });
